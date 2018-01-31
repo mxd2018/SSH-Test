@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<!--
+对象关系映射配置
+
+类和表的映射
+-->
+
+<hibernate-mapping package="com.mxd.model" default-lazy="true">
+	<class name="com.mxd.model.User" table="user">
+		<id name="id" column="ID">
+			<!-- 插入值时设置主键自增 -->
+			<generator class="increment"></generator>
+		</id>
+		<property name="username" column="USERNAME"></property>
+		<property name="password" column="PASSWORD"></property>
+	</class>
+	
+</hibernate-mapping>

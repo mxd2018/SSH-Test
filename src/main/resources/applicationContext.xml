@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+    	http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.3.xsd 
+        
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.2.xsd 
+        
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+        
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+        ">
+
+	<context:component-scan base-package="com.mxd"></context:component-scan>
+	
+	<context:property-placeholder location="classpath:db.properties" />
+
+	<bean name="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		p:jdbcUrl="${jdbc.jdbcUrl}" 
+		p:driverClass="${jdbc.driverClass}"
+		p:user="root" 
+		p:password="123" />
+
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:hibernate.cfg.xml" />
+		
+		<property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate5.SpringSessionContext</prop>
+            </props>
+        </property>
+	</bean>	
+	
+	<!--事务管理-->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<!-- 数据源 -->
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- 注解的方式管理事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+	<!-- 这个对应的是LoginService类，property是该类的属性，如果类中提供set/get方法就相当于注入了 -->
+	<!-- <bean id="loginService" class="com.mxd.service.LoginService">
+		<property name="loginDao" ref="loginDao"></property>
+	</bean> -->
+	
+	<!-- 这个对应的是LoginDao类，property是该类的属性，如果类中提供set/get方法就相当于注入了 -->
+	<!-- <bean id="loginDao" class="com.mxd.dao.LoginDao">
+		 注入hibernateTemplate
+     	 <property name="hibernateTemplate" ref="hibernateTemplate"></property>
+	</bean> -->
+	
+	 <!-- 配置HibernateTemplate -->
+	 <!-- bean的作用：spring初始化时，会创建该类的实例对象
+	 	  @Autowired的作用：将执行类中的‘类属性’通过bean中的property进行实例化，此时就不需要加set/get方法
+	 	     注意:
+	 	     如果类中属性没加@Autowired,spring初始化时实例好的对象是不会被注入的，
+	 	     要想注入对象就是在xml配置文件中bean实例化LoginDao的时候,用property注入，此时类中需要set/get方法获得注入对象
+	 -->
+   <bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
+    	<!-- 注入sessionFactory -->
+    	<property name="sessionFactory" ref="sessionFactory"></property>
+ 	</bean>
+
+</beans>
+
+
